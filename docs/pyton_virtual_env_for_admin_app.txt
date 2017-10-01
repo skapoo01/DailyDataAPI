@@ -1,0 +1,5 @@
+python 3.6
+pip3
+flask
+pytest
+wheel
