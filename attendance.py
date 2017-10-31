@@ -4,6 +4,11 @@
 #
 # for OYD Daily Program
 from events import *
+from student import *
+from natarea import *
+from region import *
+from school import *
+from course import *
 
 class Attendance (object):
     def __init__(self, student_sql_id=None,
@@ -149,8 +154,35 @@ def attendanceDaily (db, student_sql_id_list, date):
             c.execute('INSERT INTO attendance (' + attd.schema_insert + \
                 ') VALUES ' + attd.schema_insert_sub, attd._get())
 
+            # get the Student record
+            stud = Student()
+            stud.attrs['student_sql_id'] = stud_sql_id
+            stud.get(db)
+
+            # look up the school name, region name, and nat_area name
+            # for writing the Master Events Table which is de-normalized
+            school = School()
+            school.attrs['school_id'] = stud.attrs['school']
+            school.get(db)
+
+            region = Region()
+            region.attrs['region_id'] = school.attrs['school_region']
+            region.get(db)
+
+            nat_area = NatArea()
+            nat_area.attrs['nat_area_id'] = region.attrs['nat_area']
+            nat_area.get(db)
+
             # write an event to the Master Events Tables
-            mstrevent = Master_Event('attendance', date, stud_sql_id)
+            mstrevent = Master_Event(event = 'attendance',
+                date = date,
+                student_sql_id = stud_sql_id,
+                nat_area_name = nat_area.attrs['area_name'],
+                region_name = region.attrs['region_name'],
+                school_name = school.attrs['school_name'],
+                age = stud.attrs['age'],
+                first_name = stud.attrs['first_name'],
+                last_name = stud.attrs['last_name'])
             mstrevent.put(db)
 
         except:
@@ -184,9 +216,39 @@ def attendanceMLT (db, student_sql_id, date, course, lesson):
         c.execute('INSERT INTO mltattendance (' + mlt_attd.schema_insert + \
             ') VALUES ' + mlt_attd.schema_insert_sub, mlt_attd._get())
 
+        # get the Student record
+        stud = Student()
+        stud.attrs['student_sql_id'] = student_sql_id
+        stud.get(db)
+
+        # look up the school name, region name, and nat_area name
+        # for writing the Master Events Table which is de-normalized
+        school = School()
+        school.attrs['school_id'] = stud.attrs['school']
+        school.get(db)
+        region = Region()
+        region.attrs['region_id'] = school.attrs['school_region']
+        region.get(db)
+        nat_area = NatArea ()
+        nat_area.attrs['nat_area_id'] = region.attrs['nat_area']
+        nat_area.get(db)
+
+        # look up the course
+        crs = Course()
+        crs.attrs['course_id'] = course
+        crs.get(db)
+
         # write an event to the Master Events Tables
-        mstrevent = Master_Event(event = 'MLTattendance', date = date,
-            student_sql_id = student_sql_id)
+        mstrevent = Master_Event(event = 'MLTattendance',
+            date = date,
+            student_sql_id = student_sql_id,
+            nat_area_name = nat_area.attrs['area_name'],
+            region_name = region.attrs['region_name'],
+            school_name = school.attrs['school_name'],
+            age = stud.attrs['age'],
+            first_name = stud.attrs['first_name'],
+            last_name = stud.attrs['last_name'],
+            course_name = crs.attrs['course_name'])
         mstrevent.put(db)
 
     except:

@@ -324,6 +324,9 @@ def refresh_areas (filename, silent_mode):
     # Create students table
     stm.create (database)
 
+    natarea = NatArea (area_name='West', area_abbrev="WST")
+    natarea.put(database)
+
     if not silent_mode:
         # Print the updated students table
         title = f"Refresh {filename} National Areas Table: Added Areas to Database"
@@ -344,6 +347,12 @@ def refresh_regions (filename, silent_mode):
 
     # Create students table
     stm.create (database)
+
+    region = Region (region_name='Pacific NW', region_abbrev="PNW",
+        nat_area=1, main_reg_id='15500', email='david@seattleoyd.com',
+        street='7858 Leary Way', city='Redmond', state='WA', postal_code='98052',
+        phone='(425) 202-4898', status='0', standing='0')
+    region.put(database)
 
     if not silent_mode:
         # Print the updated students table
@@ -416,6 +425,9 @@ def refresh_courses (filename, silent_mode):
     # Create students table
     schtm.create (database)
 
+    course = Course (course_name='Bagua Program Year 1', course_abbrev="Bagua1")
+    course.put(database)
+
     if not silent_mode:
         # Print the updated students table
         title = f"Refresh {filename} Courses Table: Added Courses to Database"
@@ -467,18 +479,18 @@ def refresh_MLTattendance (filename, silent_mode):
 
 # Refresh the Whole Database - used by Tests
 def refresh_db (filename):
-    refresh_students (filename, True)
+    refresh_areas (filename, True)
+    refresh_regions (filename, True)
+    refresh_schools (filename, True)
     refresh_newstudents (filename, True)
     refresh_testingevents (filename, True)
     refresh_dropevents (filename, True)
     refresh_masterevents (filename, True)
-    refresh_informations (filename, True)
-    refresh_areas (filename, True)
-    refresh_regions (filename, True)
-    refresh_schools (filename, True)
     refresh_courses (filename, True)
     refresh_attendance (filename, True)
     refresh_MLTattendance (filename, True)
+    refresh_informations (filename, True)
+    refresh_students (filename, True)
 
 if __name__ == "__main__":
     # if run as the main program - refresh the oyd_daily.db

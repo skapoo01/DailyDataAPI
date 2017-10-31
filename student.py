@@ -8,6 +8,9 @@
 # Note: the schema for the Students_Table() is defined in the Student() object
 from datetime import datetime
 from events import *
+from school import *
+from region import *
+from natarea import *
 
 class Students_Table(object):
     def __init__(self):
@@ -325,6 +328,8 @@ class Student(object):
             country - defaults to 'USA'
             email, mobile_phone, home_phone - contact info
             parental_contact
+            occupation
+            how_found
             intern_points
             last_test_date
             next_test_date
@@ -341,6 +346,7 @@ class Student(object):
         street=None, street2=None, city=None, state=None, postal_code=None,
         country='USA', email=None, mobile_phone=None, home_phone=None,
         parental_contact=None,
+        occupation=None, how_found=None,
         intern_points=0,
         last_test_date=None, next_test_date=None,
         facebook=None, instagram=None, twitter=None):
@@ -378,6 +384,8 @@ class Student(object):
             'mobile_phone': mobile_phone,
             'home_phone': home_phone,
             'parental_contact': parental_contact,
+            'occupation': occupation,
+            'how_found': how_found,
             'intern_points': intern_points,
             'last_test_date': last_test_date,
             'next_test_date': next_test_date,
@@ -432,6 +440,8 @@ class Student(object):
             'mobile_phone': 'Mobile Phone:',
             'home_phone': 'Home Phone:',
             'parental_contact': 'Parental Contact:',
+            'occupation': 'Occupation:',
+            'how_found': 'How Found School:',
             'intern_points': 'Intern Points:',
             'last_test_date': 'Last Test Date:',
             'next_test_date': 'Next Test Date:',
@@ -467,6 +477,8 @@ class Student(object):
             'mobile_phone': 'text',
             'home_phone': 'text',
             'parental_contact': 'text',
+            'occupation': 'text',
+            'how_found': 'text',
             'intern_points': 'number',
             'last_test_date': 'date',
             'next_test_date': 'date',
@@ -503,6 +515,8 @@ class Student(object):
             'mobile_phone',
             'home_phone',
             'parental_contact',
+            'occupation',
+            'how_found',
             'intern_points',
             'last_test_date',
             'next_test_date',
@@ -526,6 +540,8 @@ class Student(object):
             'datetime',
             'integer',
             'datetime',
+            'text',
+            'text',
             'text',
             'text',
             'text',
@@ -664,6 +680,31 @@ class Student(object):
             self.attrs['start_date'])
         ns.put(db)
 
+        # look up the school name, region name, and nat_area name
+        # for writing the Master Events Table which is de-normalized
+        school = School()
+        school.attrs['school_id'] = self.attrs['school']
+        school.get(db)
+        region = Region()
+        region.attrs['region_id'] = school.attrs['school_region']
+        region.get(db)
+        nat_area = NatArea ()
+        nat_area.attrs['nat_area_id'] = region.attrs['nat_area']
+        nat_area.get(db)
+
+        # write an event to the Master Events Tables
+        me = Master_Event(event = 'newstudent',
+            date = self.attrs['start_date'],
+            student_sql_id = self.attrs['student_sql_id'],
+            nat_area_name = nat_area.attrs['area_name'],
+            region_name = region.attrs['region_name'],
+            school_name = school.attrs['school_name'],
+            age = self.attrs['age'],
+            first_name = self.attrs['first_name'],
+            last_name = self.attrs['last_name'],
+            occupation = self.attrs['occupation'])
+        me.put(db)
+
         return (0, "New Student Added to Database")
 
     def _sql_update_attr (self, db, conn, c, label):
@@ -694,6 +735,29 @@ class Student(object):
                         txt_date, self.attrs['drop_reason'])
                     ns.put(db)
 
+                    # look up the school name, region name, and nat_area name
+                    # for writing the Master Events Table which is de-normalized
+                    school = School()
+                    school.attrs['school_id'] = self.attrs['school']
+                    school.get(db)
+                    region = Region()
+                    region.attrs['region_id'] = school.attrs['school_region']
+                    region.get(db)
+                    nat_area = NatArea ()
+                    nat_area.attrs['nat_area_id'] = region.attrs['nat_area']
+                    nat_area.get(db)
+
+                    # write an event to the Master Events Tables
+                    me = Master_Event(event = 'drop',
+                        date = txt_date,
+                        student_sql_id = self.attrs['student_sql_id'],
+                        nat_area_name = nat_area.attrs['area_name'],
+                        region_name = region.attrs['region_name'],
+                        school_name = school.attrs['school_name'],
+                        age = self.attrs['age'],
+                        first_name = self.attrs['first_name'],
+                        last_name = self.attrs['last_name'])
+                    me.put(db)
                 # check if this is a 'testing' event
                 elif label == 'last_test_date':
                     # write an event to Testing Events Table
@@ -701,6 +765,29 @@ class Student(object):
                         self.attrs['last_test_date'], self.attrs['rank'], 'pass')
                     te.put(db)
 
+                    # look up the school name, region name, and nat_area name
+                    # for writing the Master Events Table which is de-normalized
+                    school = School()
+                    school.attrs['school_id'] = self.attrs['school']
+                    school.get(db)
+                    region = Region()
+                    region.attrs['region_id'] = school.attrs['school_region']
+                    region.get(db)
+                    nat_area = NatArea ()
+                    nat_area.attrs['nat_area_id'] = region.attrs['nat_area']
+                    nat_area.get(db)
+
+                    # write an event to the Master Events Tables
+                    me = Master_Event(event = 'test',
+                        date = self.attrs['last_test_date'],
+                        student_sql_id = self.attrs['student_sql_id'],
+                        nat_area_name = nat_area.attrs['area_name'],
+                        region_name = region.attrs['region_name'],
+                        school_name = school.attrs['school_name'],
+                        age = self.attrs['age'],
+                        first_name = self.attrs['first_name'],
+                        last_name = self.attrs['last_name'])
+                    me.put(db)
                 return 0    # return Success
             except Exception as e:
                 print (f"ERROR: _set_update_attr: {e}")

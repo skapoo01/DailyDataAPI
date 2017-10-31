@@ -5,6 +5,9 @@
 # for OYD Daily Program
 #
 from events import *
+from school import *
+from region import *
+from natarea import *
 
 # class Information: This class represents a single information.
 # An "information" is a prospective student who contacted the school
@@ -298,9 +301,28 @@ class Information(object):
         self.attrs['info_sql_id'] = row[0]
         self._sql_id = row[0]
 
+        # look up the school name, region name, and nat_area name
+        # for writing the Master Events Table which is de-normalized
+        school = School()
+        school.school_id = self.attrs['school']
+        school.get(db)
+        region = Region()
+        region.region_id = school.attrs['school_region']
+        region.get(db)
+        nat_area = NatArea ()
+        nat_area.nat_area_id = region.attrs['nat_area']
+        nat_area.get(db)
+
         # write an event to the Master Events Tables
         me = Master_Event(event = 'info', date = self.attrs['date'],
-            info_sql_id = self.attrs['info_sql_id'])
+            info_sql_id = self.attrs['info_sql_id'],
+            nat_area_name = nat_area.attrs['area_name'],
+            region_name = region.attrs['region_name'],
+            school_name = school.attrs['school_name'],
+            age = self.attrs['age'],
+            first_name = self.attrs['first_name'],
+            last_name = self.attrs['last_name'],
+            occupation = self.attrs['occupation'])
         me.put(db)
 
         return (0, 'New Information Added to Database')

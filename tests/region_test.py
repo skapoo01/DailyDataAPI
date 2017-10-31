@@ -105,7 +105,7 @@ def test_count():
     assert region2.put (db) == (0, 'Region Successfully Added!')
 
     rt = Regions_Table()
-    assert rt.count (db) == 2
+    assert rt.count (db) == 3
 
     db.close_db()
 
@@ -159,4 +159,4 @@ def test_query_all():
 
     rt = Regions_Table()
     assert rt.query_all (db=db) == 0
-    assert len(rt.regions) == 2
+    assert len(rt.regions) == 3

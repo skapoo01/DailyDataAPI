@@ -34,7 +34,7 @@ def test_put():
     db = Database()
     db.open_db('test.db')
 
-    natarea1 = NatArea(area_name='West', area_abbrev="WST")
+    natarea1 = NatArea(area_name='South', area_abbrev="STH")
     assert natarea1.get (db) != 0
     assert natarea1.put (db) == (0, 'Area Successfully Added!')
 
@@ -83,7 +83,7 @@ def test_count():
     assert natarea2.put (db) == (0, 'Area Successfully Added!')
 
     na = NatAreas_Table()
-    assert na.count (db) == 2
+    assert na.count (db) == 3
 
     db.close_db()
 
@@ -121,4 +121,4 @@ def test_query_all():
 
     na = NatAreas_Table()
     assert na.query_all (db=db) == 0
-    assert len(na.areas) == 2
+    assert len(na.areas) == 3

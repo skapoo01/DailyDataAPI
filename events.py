@@ -13,9 +13,26 @@ class Master_Event(object):
             event - values: info, newstudent, attendance, mlt-attendance, ncourse, test, drop
             date - date of event
             student_sql_id - student's sql id from Student table if Studen event
-            info_sql_id - information's sql id from Informations Table"""
+            info_sql_id - information's sql id from Informations Table
+            nat_area_name - student or informatoion's national area
+            region_name - student or information's region
+            school_name - student or information's school
+            first_name - student or information's first name
+            last_name - student or information's last name
+            age - student or information's age
+            occupation - student or information's occupation
+            rank - student's rank (if student related event)
+            rank_tested - rank for which the student tested (if testing event)
+            pass_fail - pass or fail for rank tested (if testing event)
+            course_name - name of course (if mlt-attendance event)
+            """
 
-    def __init__(self, event=None, date=None, student_sql_id=None, info_sql_id=None):
+    def __init__(self, event=None, date=None, student_sql_id=None, info_sql_id=None,
+        nat_area_name=None, region_name=None, school_name=None,
+        first_name=None, last_name=None,
+        age = None, occupation=None,
+        rank=None, rank_tested=None, pass_fail=None,
+        course_name=None):
         """ Master_Event Object: __init__ Method
             Parameters:
             1) See help for the Object definition for all attributes.
@@ -27,7 +44,18 @@ class Master_Event(object):
                     'event': event,
                     'date': date,
                     'student_sql_id': student_sql_id,
-                    'info_sql_id': info_sql_id
+                    'info_sql_id': info_sql_id,
+                    'nat_area_name': nat_area_name,
+                    'region_name': region_name,
+                    'school_name': school_name,
+                    'first_name': first_name,
+                    'last_name': last_name,
+                    'age': age,
+                    'occupation': occupation,
+                    'rank': rank,
+                    'rank_tested': rank_tested,
+                    'pass_fail': pass_fail,
+                    'course_name': course_name
                     }
 
         # SQL Schema
@@ -36,7 +64,18 @@ class Master_Event(object):
             'event',
             'date',
             'student_sql_id',
-            'info_sql_id'
+            'info_sql_id',
+            'nat_area_name',
+            'region_name',
+            'school_name',
+            'first_name',
+            'last_name',
+            'age',
+            'occupation',
+            'rank',
+            'rank_tested',
+            'pass_fail',
+            'course_name'
             ]
 
         # create the INSERT schema substituion string
@@ -48,7 +87,18 @@ class Master_Event(object):
             'text',
             'datetime',
             'integer',
-            'integer'
+            'integer',
+            'text',
+            'text',
+            'text',
+            'text',
+            'text',
+            'integer',
+            'text',
+            'text',
+            'text',
+            'text',
+            'text'
             ]
 
         # make the CREATE schema substituion string
@@ -188,10 +238,6 @@ class New_Students_Event(object):
             c.execute('INSERT INTO newstudents (' +  self.schema_insert + \
                 ') VALUES ' + self.schema_insert_sub, self._get())
 
-            # write an event to the Master Events Tables
-            me = Master_Event('newstudent', self.attrs['signup_date'],
-                self.attrs['student_sql_id'])
-            me.put(db)
         except:
             # Insert failed so return Error
             return 1
@@ -408,11 +454,6 @@ class Drop_Event(object):
         try:
             c.execute('INSERT INTO dropevents (' +  self.schema_insert + \
                 ') VALUES ' + self.schema_insert_sub, self._get())
-
-            # write an event to the Master Events Tables
-            me = Master_Event('drop', self.attrs['drop_date'],
-                self.attrs['student_sql_id'])
-            me.put(db)
 
         except:
             # Insert failed so return Error

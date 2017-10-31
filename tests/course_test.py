@@ -81,7 +81,7 @@ def test_count():
     assert course2.put (db) == 0
 
     ct = Courses_Table()
-    assert ct.count (db) == 2
+    assert ct.count (db) == 3
 
     db.close_db()
 
@@ -119,4 +119,4 @@ def test_query_all():
 
     ct = Courses_Table()
     assert ct.query_all (db=db) == 0
-    assert len(ct.courses) == 2
+    assert len(ct.courses) == 3

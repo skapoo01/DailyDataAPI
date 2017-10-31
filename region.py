@@ -321,6 +321,9 @@ class Region (object):
 
         try:
             # Test 1, check for the SQL ID
+
+            print(f"DEBUG: region._sql_populate region_id = {self.attrs['region_id']}")
+
             if self.attrs['region_id']:
                 test = (self.attrs['region_id'], )
                 c.execute('SELECT * FROM regions WHERE region_id=?', test)

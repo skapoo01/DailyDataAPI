@@ -49,7 +49,7 @@ def test_attendanceMLT():
         str(now.year)
 
     for stud_sql_id in sql_id_list:
-        assert attendanceMLT(db, stud_sql_id, txt_date, 'Bagua', 1) == 0
+        assert attendanceMLT(db, stud_sql_id, txt_date, 1, 1) == 0
 
     c = db.cursor
     c.execute('SELECT * FROM mltattendance')
